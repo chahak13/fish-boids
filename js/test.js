@@ -5,14 +5,16 @@ function setup() {
   createCanvas(1300, 590);
   flock = new Flock();
 
-  // for (var i = 0; i < 10; i++) {
-    var boid = new Boid(width/2, height/2);
+  for (var i = 0; i < 10; i++) {
+    var boid = new Boid(width/2 + 10*i, height/2 + 10*i);
+    console.log('i: '+i+' position: '+boid.position)
     flock.addBoid(boid);
-  // }
+    // boid.render()
+  }
 }
 
 function draw() {
-  background(0);
+  background(253, 233, 103);
   flock.moveBoids();
 }
 
@@ -44,16 +46,17 @@ Flock.prototype.moveBoids = function(){
 // Boid class
 function Boid(x, y){
   this.position = createVector(x,y);
-  this.velocity = createVector(random(-1,1), random(-1,1));
+  this.velocity = createVector(random(-1,1),random(-1,1));
   this.r = 2.0;
-  this.maxSpeed = 2.0;
+  this.maxSpeed = 3.0;
+  this.maxForce = 0.1;
 }
 
 Boid.prototype.velocityCohesion = function (boid, boidNumber) {
-  var neighbordist = 50;
+  var neighbordist = 100;
   var movementFactor = 100;
   var nearbyBirds = 0;
-  var perceivedCenterOfMass = createVector(0,0)
+  var perceivedCenterOfMass = createVector(0,0);
   for (var i = 0; i < flock.boids.length; i++) {
     var distance = boid.position.dist(flock.boids[i].position)
     if (distance != 0 && distance < neighbordist ) {
@@ -64,8 +67,8 @@ Boid.prototype.velocityCohesion = function (boid, boidNumber) {
 
   if(nearbyBirds>0){
     perceivedCenterOfMass.div(nearbyBirds);
-    velocity = perceivedCenterOfMass.sub(boid.position).div(movementFactor);
-    return velocity.limit(0.01);
+    velocity = p5.Vector.sub(perceivedCenterOfMass,boid.position).div(movementFactor);
+    return velocity.limit(this.maxForce);
   }
   else{
     return createVector(0,0);
@@ -73,18 +76,26 @@ Boid.prototype.velocityCohesion = function (boid, boidNumber) {
 }
 
 Boid.prototype.velocitySeparation = function (boid, boidNumber) {
-
   var limitingDistance = 25.0;
   var limitingPosition = createVector(0,0);
+  var nearbyBirds = 0;
   for (var i = 0; i < flock.boids.length; i++) {
     var distance = boid.position.dist(flock.boids[i].position);
-    if (distance != 0 && distance < limitingDistance){
-        limitingPosition.sub(flock.boids[i].position.sub(boid.position));
+    if (distance > 0 && distance < limitingDistance ){
+        var diff = p5.Vector.sub(this.position,flock.boids[i].position);
+        limitingPosition.add(diff.normalize().div(distance));
+        nearbyBirds++;
       }
     }
 
+  if(limitingPosition.mag() && nearbyBirds){
+    limitingPosition.div(nearbyBirds);
+    limitingPosition.normalize().mult(boid.maxSpeed).sub(boid.velocity).limit(boid.maxForce);
+  }
+
   return limitingPosition
 }
+
 
 Boid.prototype.velocityAlignment = function(boid, boidNumber) {
   var neighbordist = 50;
@@ -100,7 +111,7 @@ Boid.prototype.velocityAlignment = function(boid, boidNumber) {
   }
   if (nearbyBirds) {
     perceivedVelocity.div(nearbyBirds);
-    velocity = perceivedVelocity.sub(boid.velocity).div(movementFactor);
+    velocity = p5.Vector.sub(perceivedVelocity,(boid.velocity)).div(movementFactor);
 
     return velocity;
   }
@@ -112,8 +123,11 @@ Boid.prototype.velocityAlignment = function(boid, boidNumber) {
 
 Boid.prototype.update = function (boidNumber) {
   v1 = this.velocityCohesion(this, boidNumber);
+  // v1 = createVector(0,0);
   v2 = this.velocitySeparation(this, boidNumber);
+  // v2 = createVector(0,0);
   v3 = this.velocityAlignment(this, boidNumber);
+  // v3 = createVector(0,0);
 
   this.velocity = this.velocity.add(v1).add(v2).add(v3);
   this.velocity.limit(this.maxSpeed);
@@ -127,17 +141,13 @@ Boid.prototype.borders = function() {
   if (this.position.y < -this.r)  this.position.y = height+this.r;
   if (this.position.x > width +this.r) this.position.x = -this.r;
   if (this.position.y > height+this.r) this.position.y = -this.r;
-  // if (this.position.x < -this.r)  this.position.x = -this.position.x;
-  // if (this.position.y < -this.r)  this.position.y = -this.position.y;
-  // if (this.position.x > width +this.r) this.position.x = -this.position.x;
-  // if (this.position.y > height+this.r) this.position.y = -this.position.y;
 }
 
 Boid.prototype.render = function() {
   // Draw a triangle rotated in the direction of velocity
   var theta = this.velocity.heading() + radians(90);
-  fill(127);
-  stroke(200);
+  fill('rgba(0,0,0,0)');
+  stroke(0);
   push();
   translate(this.position.x,this.position.y);
   rotate(theta);
@@ -146,5 +156,6 @@ Boid.prototype.render = function() {
   vertex(-this.r, this.r*2);
   vertex(this.r, this.r*2);
   endShape(CLOSE);
+  // ellipse(0,0,this.r, this.r)
   pop();
 }

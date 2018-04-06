@@ -10,11 +10,11 @@ Flock.prototype.addBoid = function(boid){
 
 Flock.prototype.moveBoids = function(){
   console.log('Reached moveBoids with '+this.boids.length+ 'boids')
-  for (var i = 0; i < this.boids.length; i++) {
-
-    this.boids[i].update(i);
-    this.boids[i].borders();
-    this.boids[i].render();
+  if (this.boids.length != 0) {
+    for (var i = 0; i < this.boids.length; i++) {
+      this.boids[i].update(i);
+      this.boids[i].borders();
+      this.boids[i].render();
+    }
   }
-
 }

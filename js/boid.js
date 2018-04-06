@@ -1,5 +1,6 @@
 // Boid class
 function Boid(x, y){
+  this.mass = 1.0;
   this.position = createVector(x,y);
   this.velocity = createVector(random(-1,1),random(-1,1));
   this.r = 2.0;
@@ -7,16 +8,16 @@ function Boid(x, y){
   this.maxForce = 0.05;
 }
 
+
 Boid.prototype.velocityCohesion = function (boid, boidNumber) {
   var neighbordist = 50;
   var movementFactor = 1;
   var nearbyBirds = 0;
   var perceivedCenterOfMass = createVector(0,0);
-  for (var i = 0; i < flock.boids.length; i++) {
-    var distance = boid.position.dist(flock.boids[i].position)
-    // var distance = p5.Vector.dist(this.position,flock.boids[i].position);
+  for (b of flock.boids) {
+    var distance = boid.position.dist(b.position)
     if (distance != 0 && distance < neighbordist ) {
-      perceivedCenterOfMass.add(flock.boids[i].position);
+      perceivedCenterOfMass.add(b.position);
       nearbyBirds++;
     }
   }
@@ -38,10 +39,10 @@ Boid.prototype.velocitySeparation = function (boid, boidNumber) {
   var limitingDistance = 30.0;
   var limitingPosition = createVector(0,0);
   var nearbyBirds = 0;
-  for (var i = 0; i < flock.boids.length; i++) {
-    var distance = boid.position.dist(flock.boids[i].position);
+  for (b of flock.boids) {
+    var distance = boid.position.dist(b.position);
     if (distance != 0 && distance < limitingDistance ){
-        var diff = p5.Vector.sub(boid.position,flock.boids[i].position);
+        var diff = p5.Vector.sub(boid.position,b.position);
         limitingPosition.add(diff.normalize().div(distance));
         nearbyBirds++;
       }
@@ -63,10 +64,10 @@ Boid.prototype.velocityAlignment = function(boid, boidNumber) {
   var movementFactor = 1;
   var perceivedVelocity = createVector(0,0);
   var nearbyBirds = 0;
-  for (var i = 0; i < flock.boids.length; i++) {
-    var distance = boid.position.dist(flock.boids[i].position);
+  for (b of flock.boids) {
+    var distance = boid.position.dist(b.position);
     if (distance != 0 && distance < neighbordist) {
-      perceivedVelocity.add(flock.boids[i].velocity);
+      perceivedVelocity.add(b.velocity);
       nearbyBirds++;
     }
   }
@@ -74,7 +75,6 @@ Boid.prototype.velocityAlignment = function(boid, boidNumber) {
     perceivedVelocity.div(nearbyBirds);
     perceivedVelocity.normalize();
     perceivedVelocity.mult(boid.maxSpeed);
-    // perceivedVelocity.sub(boid.velocity);
     velocity = p5.Vector.sub(perceivedVelocity,(boid.velocity));
     return velocity.limit(boid.maxForce);
   }
@@ -85,21 +85,66 @@ Boid.prototype.velocityAlignment = function(boid, boidNumber) {
 
 
 Boid.prototype.update = function (boidNumber) {
+
+  var acceleration = createVector(0,0);
+
+  // If predator eats the prey
+  // for (var i = 0; i < predatorFlock.boids.length; i++) {
+  //   if (this.position.dist(predatorFlock.boids[i].position)<50) {
+  //     flock.boids.splice(flock.boids.indexOf(this),1);
+  //     console.log('deleted boid '+i);
+  //   }
+  // }
+  // if (flock.boids.length == 0) {
+  //   return
+  // }
+
+  if (predatorFlock.boids.length) {
+    for (predator of predatorFlock.boids) {
+      predForce = this.repelForce(predator.position);
+      acceleration.add(predForce);
+    }
+  }
+
+
   var cohesionCoefficient = 1.0;
   var separationCoefficient = 1.5;
   var alignmentCoefficient = 1.5;
-  v1 = this.velocityCohesion(this, boidNumber).mult(cohesionCoefficient);
-  // v1 = createVector(0,0);
-  v2 = this.velocitySeparation(this, boidNumber).mult(separationCoefficient);
-  // v2 = createVector(0,0);
-  v3 = this.velocityAlignment(this, boidNumber).mult(alignmentCoefficient);
-  // v3 = createVector(0,0);
 
-  this.velocity = this.velocity.add(v1).add(v2).add(v3);
+  cohesionForce = this.velocityCohesion(this, boidNumber).mult(cohesionCoefficient);
+  separationForce = this.velocitySeparation(this, boidNumber).mult(separationCoefficient);
+  alignmentForce = this.velocityAlignment(this, boidNumber).mult(alignmentCoefficient);
+
+  acceleration.add(cohesionForce);
+  acceleration.add(separationForce);
+  acceleration.add(alignmentForce);
+
+  this.velocity.add(acceleration);
   this.velocity.limit(this.maxSpeed);
   this.position = this.position.add(this.velocity);
 
+
 };
+
+Boid.prototype.repelForce = function(predatorLocation) {
+  var safeDistance = 50;
+  var futurePosition = p5.Vector.add(this.position, this.velocity);
+  var distance = p5.Vector.dist(predatorLocation, futurePosition);
+
+  if (distance <= safeDistance) {
+    repelVector = p5.Vector.sub(this.position, predatorLocation);
+    repelVector.normalize();
+    if (distance != 0) {
+      repelVector.mult(this.maxForce*5);
+      if (repelVector.mag()<0) {
+        repelVector.y = 0;
+      }
+    }
+    return repelVector;
+  }
+
+  return createVector(0,0);
+}
 
 Boid.prototype.borders = function() {
   // console.log('It does Wraparound')

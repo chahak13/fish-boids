@@ -4,7 +4,9 @@ function setup(){
   b = createVector(1,1);
   console.log(a.sub(b));
   console.log(a);
-
+  arr = [1,2,33];
+  index = arr.indexOf(2);
+  console.log(index);
 }
 
 function draw(){

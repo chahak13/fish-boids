@@ -3,40 +3,13 @@ function Predator(x, y){
   this.mass = 1.0;
   this.position = createVector(x,y);
   this.velocity = createVector(random(-1,1),random(-1,1));
-  this.r = 2.0;
+  this.r = 3.5;
   this.maxSpeed = 2.0;
   this.maxForce = 0.05;
 }
 
-
-Predator.prototype.velocityCohesion = function (boid) {
-  var neighbordist = 50;
-  var movementFactor = 1;
-  var nearbyBoids = 0;
-  var perceivedCenterOfMass = createVector(0,0);
-  for (b of flock.boids) {
-    var distance = boid.position.dist(b.position)
-    if (distance != 0 && distance < neighbordist ) {
-      perceivedCenterOfMass.add(b.position);
-      nearbyBoids++;
-    }
-  }
-
-  if(nearbyBoids>0){
-    perceivedCenterOfMass.div(nearbyBoids);
-    velocity = p5.Vector.sub(perceivedCenterOfMass,boid.position);
-    velocity.normalize();
-    velocity.mult(boid.maxSpeed);
-    velocity.sub(boid.velocity);
-    return velocity.limit(this.maxForce);
-  }
-  else{
-    return createVector(0,0);
-  }
-}
-
 Predator.prototype.velocitySeparation = function (boid) {
-  var limitingDistance = 30.0;
+  var limitingDistance = radiusSeparationSliderValuePredator * this.r;
   var limitingPosition = createVector(0,0);
   var nearbyBoids = 0;
   for (b of flock.boids) {
@@ -58,50 +31,19 @@ Predator.prototype.velocitySeparation = function (boid) {
   return limitingPosition
 }
 
-
-Predator.prototype.velocityAlignment = function(boid) {
-  var neighbordist = 50;
-  var movementFactor = 1;
-  var perceivedVelocity = createVector(0,0);
-  var nearbyBoids = 0;
-  for (b of flock.boids) {
-    var distance = boid.position.dist(b.position);
-    if (distance != 0 && distance < neighbordist) {
-      perceivedVelocity.add(b.velocity);
-      nearbyBoids++;
-    }
-  }
-  if (nearbyBoids) {
-    perceivedVelocity.div(nearbyBoids);
-    perceivedVelocity.normalize();
-    perceivedVelocity.mult(boid.maxSpeed);
-    velocity = p5.Vector.sub(perceivedVelocity,(boid.velocity));
-    return velocity.limit(boid.maxForce);
-  }
-  else{
-    return createVector(0,0);
-  }
-}
-
-
 Predator.prototype.update = function () {
 
   var lockingVelocity = this.lockPredator();
-  // console.log(nearestBoid);
-  //
-  // nearestBoid.normalize().mult(this.maxSpeed);
-  //
-  // var acceleration = p5.Vector.sub(nearestBoid, this.velocity);
-  //
+
+  // Coefficient to scale the separation velocity 
+  var separationCoefficient = separationSliderValuePredator;
   this.velocity.add(lockingVelocity).limit(this.maxSpeed);
   this.position = this.position.add(this.velocity);
-
-
 };
 
 Predator.prototype.lockPredator = function () {
 
-  var neighbordist = 200;
+  var neighbordist = radiusPreySliderValuePredator * this.r;
   var averageBoid = createVector(0,0);
   var nearbyBoids = 0;
 

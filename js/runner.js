@@ -35,10 +35,12 @@ var radiusSeparationSliderValuePrey;
 // GUI Sliders for Predator
 var separationSliderPredator;
 var radiusSeparationSliderPredator;
+var radiusPreySliderPredator;
 
 // GUI Slider values for Predator
 var separationSliderValuePredator;
 var radiusSeparationSliderValuePredator;
+var radiusPreySliderValuePredator;
 
 var controllerXPrey; 
 var controllerYPrey;
@@ -98,10 +100,14 @@ function createGUIElements() {
     // Predator
     separationSliderPredator = createSlider(0, 2, 1, 0.05);
     radiusSeparationSliderPredator = createSlider(0, 60, 12, 0.01);
+    radiusPreySliderPredator = createSlider(0, 60, 50, 0.01);
+
     separationSliderPredator.position(controllerXPredator, controllerYPredator 
         + 0 * controllerOffset);
     radiusSeparationSliderPredator.position(controllerXPredator, controllerYPredator 
         + 1 * controllerOffset);
+    radiusPreySliderPredator.position(controllerXPredator, controllerYPredator 
+        + 2 * controllerOffset);
 
     separationPredatorLabel = createDiv('Separation Coefficient For Predator');
     separationPredatorLabel.position(separationSliderPredator.x + separationSliderPredator.width 
@@ -109,6 +115,9 @@ function createGUIElements() {
     radiusSeparationPredatorLabel = createDiv('Radius of Separation for predator');
     radiusSeparationPredatorLabel.position(radiusSeparationSliderPredator.x + 
         radiusSeparationSliderPredator.width + labelOffset, radiusSeparationSliderPredator.y);
+    radiusPreyPredatorLabel = createDiv('Radius of vision for predator');
+    radiusPreyPredatorLabel.position(radiusPreySliderPredator.x + 
+        radiusPreySliderPredator.width + labelOffset, radiusPreySliderPredator.y);
 }
 function centerCanvas() {
     var x = (windowWidth - canvasWidth) / 2;
@@ -165,6 +174,10 @@ function draw() {
 
     separationSliderValuePredator = separationSliderPredator.value();
     radiusSeparationSliderValuePredator = radiusSeparationSliderPredator.value();
+
+    separationSliderValuePredator = separationSliderPredator.value();
+    radiusSeparationSliderValuePredator = radiusSeparationSliderPredator.value();
+    radiusPreySliderValuePredator = radiusPreySliderPredator.value();
 
     flock.moveBoids();
     predatorFlock.moveBoids();

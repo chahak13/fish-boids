@@ -139,7 +139,7 @@ function createGUIElements() {
     numberOfPredatorsSlider = createSlider(0, 5, 0, 1);
     numberOfPredatorsSlider.position(controllerXPredator,
         controllerYPredator + 2 * controllerOffset);
-    numberOfPredatorsLabel = createDiv('Number of predators');
+    numberOfPredatorsLabel = createDiv('Number of Predators');
     numberOfPredatorsLabel.position(numberOfPredatorsSlider.x
         + numberOfPredatorsSlider.width + labelOffset,
         numberOfPredatorsSlider.y);

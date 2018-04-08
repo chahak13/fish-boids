@@ -1,28 +1,31 @@
 // Boid class
-function Boid(x, y){
+function Boid(x, y) {
   this.mass = 1.0;
   this.position = createVector(x,y);
   this.velocity = createVector(random(-1,1),random(-1,1));
   this.r = 2.0;
   this.maxSpeed = 2.0;
   this.maxForce = 0.05;
+  this.color = floor(random(totalColors));
 }
 
 
 Boid.prototype.velocityCohesion = function (boid) {
-  var neighbordist = 50;
+  var neighbordist = radiusCohesionSliderValuePrey * this.r;
   var movementFactor = 1;
   var nearbyBoids = 0;
   var perceivedCenterOfMass = createVector(0,0);
   for (b of flock.boids) {
     var distance = boid.position.dist(b.position)
     if (distance != 0 && distance < neighbordist ) {
-      perceivedCenterOfMass.add(b.position);
-      nearbyBoids++;
+      if(this.color == b.color) {
+        perceivedCenterOfMass.add(b.position);
+        nearbyBoids++;
+      }
     }
   }
 
-  if(nearbyBoids>0){
+  if(nearbyBoids > 0){
     perceivedCenterOfMass.div(nearbyBoids);
     velocity = p5.Vector.sub(perceivedCenterOfMass,boid.position);
     velocity.normalize();
@@ -36,7 +39,7 @@ Boid.prototype.velocityCohesion = function (boid) {
 }
 
 Boid.prototype.velocitySeparation = function (boid) {
-  var limitingDistance = 30.0;
+  var limitingDistance = radiusSeparationSliderValuePrey * this.r;
   var limitingPosition = createVector(0,0);
   var nearbyBoids = 0;
   for (b of flock.boids) {
@@ -60,9 +63,8 @@ Boid.prototype.velocitySeparation = function (boid) {
 
 
 Boid.prototype.velocityAlignment = function(boid) {
-  var neighbordist = 50;
-  var movementFactor = 1;
-  var perceivedVelocity = createVector(0,0);
+  var neighbordist = radiusAlignmentSliderValuePrey * this.r;
+  var perceivedVelocity = createVector(0, 0);
   var nearbyBoids = 0;
   for (b of flock.boids) {
     var distance = boid.position.dist(b.position);
@@ -88,17 +90,6 @@ Boid.prototype.update = function () {
 
   var acceleration = createVector(0,0);
 
-  // If predator eats the prey
-  // for (var i = 0; i < predatorFlock.boids.length; i++) {
-  //   if (this.position.dist(predatorFlock.boids[i].position)<50) {
-  //     flock.boids.splice(flock.boids.indexOf(this),1);
-  //     console.log('deleted boid '+i);
-  //   }
-  // }
-  // if (flock.boids.length == 0) {
-  //   return
-  // }
-
   if (predatorFlock.boids.length) {
     for (predator of predatorFlock.boids) {
       predForce = this.repelForce(predator.position);
@@ -107,9 +98,9 @@ Boid.prototype.update = function () {
   }
 
 
-  var cohesionCoefficient = 1.0;
-  var separationCoefficient = 2.5;
-  var alignmentCoefficient = 1.5;
+  var cohesionCoefficient = cohesionSliderValuePrey;
+  var separationCoefficient = separationSliderValuePrey;
+  var alignmentCoefficient = alignmentSliderValuePrey;
 
   cohesionForce = this.velocityCohesion(this).mult(cohesionCoefficient);
   separationForce = this.velocitySeparation(this).mult(separationCoefficient);
@@ -163,10 +154,10 @@ Boid.prototype.render = function() {
   translate(this.position.x,this.position.y);
   rotate(theta);
   beginShape();
-  vertex(0, -this.r*2);
-  vertex(-this.r, this.r*2);
-  vertex(this.r, this.r*2);
+  vertex(0, -this.r * 2);
+  vertex(-this.r, this.r * 2);
+  vertex(this.r, this.r * 2);
+  fill(colorsArray[this.color]);
   endShape(CLOSE);
-  // ellipse(0,0,this.r, this.r)
   pop();
 }

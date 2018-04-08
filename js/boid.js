@@ -9,13 +9,13 @@ function Boid(x, y) {
     this.color = floor(random(totalColors));
 }
 
-
-Boid.prototype.velocityCohesion = function (boid) {
+// The velocityCohesion function returns the velocity that determined by the Flock Centering rule from Craig Reynolds' model
+Boid.prototype.velocityCohesion = function () {
     var neighbordist = radiusCohesionSliderValuePrey * this.r;
     var nearbyBoids = 0;
     var perceivedCenterOfMass = createVector(0,0);
     for (b of flock.boids) {
-        var distance = boid.position.dist(b.position)
+        var distance = this.position.dist(b.position)
         if (distance != 0 && distance < neighbordist ) {
             if(isColorSegregationOn == true) {
                 if(this.color != b.color)
@@ -28,10 +28,10 @@ Boid.prototype.velocityCohesion = function (boid) {
 
     if(nearbyBoids > 0){
         perceivedCenterOfMass.div(nearbyBoids);
-        velocity = p5.Vector.sub(perceivedCenterOfMass,boid.position);
+        velocity = p5.Vector.sub(perceivedCenterOfMass,this.position);
         velocity.normalize();
-        velocity.mult(boid.maxSpeed);
-        velocity.sub(boid.velocity);
+        velocity.mult(this.maxSpeed);
+        velocity.sub(this.velocity);
         return velocity.limit(this.maxForce);
     }
     else{
@@ -39,6 +39,7 @@ Boid.prototype.velocityCohesion = function (boid) {
     }
 }
 
+// The velocitySeparation function returns the velocity as governed by the Collision Avoidance rule from Craig Reynolds' model
 Boid.prototype.velocitySeparation = function (boid) {
     var limitingDistance = radiusSeparationSliderValuePrey * this.r;
     var limitingPosition = createVector(0,0);
@@ -62,13 +63,13 @@ Boid.prototype.velocitySeparation = function (boid) {
     return limitingPosition
 }
 
-
-Boid.prototype.velocityAlignment = function(boid) {
+// The velocitySeparation function returns the velocity as governed by the Velocity Matching rule from Craig Reynolds' model
+Boid.prototype.velocityAlignment = function() {
     var neighbordist = radiusAlignmentSliderValuePrey * this.r;
     var perceivedVelocity = createVector(0, 0);
     var nearbyBoids = 0;
     for (b of flock.boids) {
-        var distance = boid.position.dist(b.position);
+        var distance = this.position.dist(b.position);
         if (distance != 0 && distance < neighbordist) {
             perceivedVelocity.add(b.velocity);
             nearbyBoids++;
@@ -77,16 +78,37 @@ Boid.prototype.velocityAlignment = function(boid) {
     if (nearbyBoids) {
         perceivedVelocity.div(nearbyBoids);
         perceivedVelocity.normalize();
-        perceivedVelocity.mult(boid.maxSpeed);
-        velocity = p5.Vector.sub(perceivedVelocity,(boid.velocity));
-        return velocity.limit(boid.maxForce);
+        perceivedVelocity.mult(this.maxSpeed);
+        velocity = p5.Vector.sub(perceivedVelocity,(this.velocity));
+        return velocity.limit(this.maxForce);
     }
     else{
         return createVector(0,0);
     }
 }
 
+// The repelForce function returns the velocity as required because of the flight reflex of the prey from the predators
+Boid.prototype.repelForce = function(predatorLocation) {
+    var safeDistance = 50;
+    var futurePosition = p5.Vector.add(this.position, this.velocity);
+    var distance = p5.Vector.dist(predatorLocation, futurePosition);
 
+    if (distance <= safeDistance) {
+        repelVector = p5.Vector.sub(this.position, predatorLocation);
+        repelVector.normalize();
+        if (distance != 0) {
+            repelVector.mult(this.maxForce*5);
+            if (repelVector.mag()<0) {
+                repelVector.y = 0;
+            }
+        }
+        return repelVector;
+    }
+
+    return createVector(0,0);
+}
+
+// The update function calculates the new position and velocity of the boid
 Boid.prototype.update = function () {
 
     var acceleration = createVector(0,0);
@@ -118,26 +140,7 @@ Boid.prototype.update = function () {
 
 };
 
-Boid.prototype.repelForce = function(predatorLocation) {
-    var safeDistance = 50;
-    var futurePosition = p5.Vector.add(this.position, this.velocity);
-    var distance = p5.Vector.dist(predatorLocation, futurePosition);
-
-    if (distance <= safeDistance) {
-        repelVector = p5.Vector.sub(this.position, predatorLocation);
-        repelVector.normalize();
-        if (distance != 0) {
-            repelVector.mult(this.maxForce*5);
-            if (repelVector.mag()<0) {
-                repelVector.y = 0;
-            }
-        }
-        return repelVector;
-    }
-
-    return createVector(0,0);
-}
-
+// This function wraps the boid around the canvas if the boid reaches the border of the canvas
 Boid.prototype.borders = function() {
     if (this.position.x < -this.r)  this.position.x = width +this.r;
     if (this.position.y < -this.r)  this.position.y = height+this.r;
@@ -145,6 +148,7 @@ Boid.prototype.borders = function() {
     if (this.position.y > height+this.r) this.position.y = -this.r;
 }
 
+// This function draws shapes of the boids on the canvas
 Boid.prototype.render = function() {
     // Draw a triangle rotated in the direction of velocity
     var theta = this.velocity.heading() + radians(90);

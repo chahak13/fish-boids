@@ -255,6 +255,7 @@ function draw() {
         }
     }
     flock.moveBoids();
+    flock.renderEllipses();
 
     // Checking if the number of predators are changed via slider and then adds or deletes accordingly
     var currentPredators = numberOfPredatorsSlider.value();

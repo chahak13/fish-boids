@@ -150,8 +150,8 @@ function createGUIElements() {
 
     // Number Density
     numberOfPredatorsSlider = createSlider(0, 5, 0, 1);
-    numberOfPredatorsSlider.position(controllerXPredator,
-        controllerYPredator + 3 * controllerOffset);
+    numberOfPredatorsSlider.position(controllerXNumber,
+        controllerYNumber + 3 * controllerOffset);
     numberOfPredatorsLabel = createDiv('Number of Predators');
     numberOfPredatorsLabel.position(numberOfPredatorsSlider.x
         + numberOfPredatorsSlider.width + labelOffset,

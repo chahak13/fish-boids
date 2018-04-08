@@ -32,3 +32,5 @@ The `runner.js` file is the most important file. It is responsible for creating 
 There are two ways to start the project and analyze the model
 
 One can either open the project online from [here](https://chahak13.github.io/fish-boids/) or can open the `index2.html` file present in the current directory to open it locally. Nothing except a browser is needed if one wants to run the project locally.
+
+###### (The project is hosted at [https://chahak13.github.io/fish-boids/](https://chahak13.github.io/fish-boids/))

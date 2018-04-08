@@ -145,7 +145,7 @@ function createGUIElements() {
         + numberOfPredatorsSlider.width + labelOffset,
         numberOfPredatorsSlider.y);
 
-    numberOfPreysSlider = createSlider(0, 100, 25, 10);
+    numberOfPreysSlider = createSlider(0, 150, 25, 10);
     numberOfPreysSlider.position(controllerXNumber,
         controllerYNumber + 2 * controllerOffset)
     numberOfPreysLabel = createDiv('Number of Preys');
@@ -204,7 +204,6 @@ function turnOnOffSegregation() {
     else {
         isColorSegregationOn = true;
     }
-    console.log("After pressing " + isColorSegregationOn);
 }
 
 // Can be optimized using functions but too lazy :\ and works :p
@@ -228,6 +227,7 @@ function draw() {
 
     var currentBoids = numberOfPreysSlider.value();
     if(currentBoids != totalBoids) {
+        console.log(currentBoids);
         if(currentBoids > totalBoids) {
             for(var i = 0; i < (currentBoids - totalBoids); i++) {
                 xOffSet = random(canvasWidth / 2);

@@ -25,7 +25,6 @@ Boid.prototype.velocityCohesion = function (boid) {
             nearbyBoids++;
         }
     }
-    console.log(nearbyBoids);
 
     if(nearbyBoids > 0){
         perceivedCenterOfMass.div(nearbyBoids);
@@ -140,7 +139,6 @@ Boid.prototype.repelForce = function(predatorLocation) {
 }
 
 Boid.prototype.borders = function() {
-    // console.log('It does Wraparound')
     if (this.position.x < -this.r)  this.position.x = width +this.r;
     if (this.position.y < -this.r)  this.position.y = height+this.r;
     if (this.position.x > width +this.r) this.position.x = -this.r;

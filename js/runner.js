@@ -5,15 +5,17 @@ var canvas;
 var totalBoids;
 var totalPredators;
 
+// Parameters that define the canvas of the webpage
 var canvasWidth;
 var canvasHeight;
 
+// Variables used in coloring the boids
 var totalColors = 2;
 var greenColor;
 var blueColor;
 var colorsArray;
 
-// GUI Slider values for prey
+// GUI Slider for prey
 var cohesionSliderValuePrey;
 var alignmentSliderValuePrey;
 var separationSliderValuePrey;
@@ -27,6 +29,7 @@ var separationSliderPredator;
 var radiusSeparationSliderPredator;
 var radiusPreySliderPredator;
 
+// Variables used to place the GUI elements correctly
 var controllerXPrey;
 var controllerYPrey;
 var controllerOffset;
@@ -38,19 +41,19 @@ var controllerYPredator;
 var controllerXNumber;
 var controllerYNumber;
 
-// Number of predators slider
+// Slider for the number of predators
 var numberOfPredatorsSlider;
 var numberOfPredatorsSliderValue;
 
-// Number of preys slider
+// Slider for the number of preys
 var numberOfPreysSlider;
 var numberOfPreysSliderValue;
 
-// Color Segregation
+// Variables for Color Segregation
 var colorSegregationOnOffButton;
 var isColorSegregationOn;
 
-// Most Important function, can be optimized
+// This function creates all  the GUI elements on the webpage other than the canvas
 function createGUIElements() {
     var epsilon = 25;
     controllerXNumber = epsilon;
@@ -60,7 +63,6 @@ function createGUIElements() {
     controllerOffset = 20;
     labelOffset = 15;
 
-    // controllerXPredator = windowWidth - canvasWidth + 125;
     controllerXPredator = (2 * (windowWidth / 3.0)) + epsilon;
     controllerYPredator = 5;
 
@@ -110,7 +112,6 @@ function createGUIElements() {
         + labelOffset, radiusCohesionSliderPrey.y);
 
     colorSegregationOnOffButton = createCheckbox('Color Segregation', false);
-    // colorSegregationOnOffButtonLabel = createDiv('Color Segregation');
     colorSegregationOnOffButton.position(controllerXNumber, controllerYNumber
         + 5 * controllerOffset);
 
@@ -156,6 +157,8 @@ function createGUIElements() {
     numberLabel.position((controllerXNumber + numberOfPredatorsSlider.width) / 2
         , controllerYNumber);
 }
+
+// This function centers the canvas on any screen
 function centerCanvas() {
     var x = (windowWidth - canvasWidth) / 2;
     var y = (windowHeight - canvasHeight) / 2 + 10 * controllerYPrey;
@@ -166,6 +169,7 @@ function windowResized() {
     centerCanvas();
 }
 
+// The setup function sets up everything for the system
 function setup() {
     canvasWidth = (2 * windowWidth) / 4;
     canvasHeight = (2.5 * windowHeight) / 4;
@@ -173,8 +177,10 @@ function setup() {
     createGUIElements();
     centerCanvas();
 
-    flock = new Flock();
-    predatorFlock = new Flock();
+    flock = new Flock(); // The flock of prey
+    predatorFlock = new Flock(); // Flock of predators
+
+    // Add initial preys
     totalBoids = numberOfPreysSlider.value();
     for (var i = 0; i < totalBoids; i++) {
         xOffSet = random(canvasWidth / 2);
@@ -182,6 +188,8 @@ function setup() {
         var boid = new Boid(canvasWidth / 2 - xOffSet, canvasHeight / 2 - yOffSet);
         flock.addBoid(boid);
     }
+
+    // Add initial predators
     totalPredators = numberOfPredatorsSlider.value();
     for (var i = 0; i < totalPredators; i++) {
         xOffSet = random(canvasWidth / 2);
@@ -197,6 +205,7 @@ function setup() {
     colorSegregationOnOffButton.changed(turnOnOffSegregation);
 }
 
+// Toggles Color Segregation
 function turnOnOffSegregation() {
     if (isColorSegregationOn) {
         isColorSegregationOn = false;
@@ -206,7 +215,7 @@ function turnOnOffSegregation() {
     }
 }
 
-// Can be optimized using functions but too lazy :\ and works :p
+// Draw function. Runs in an infinite loop and draws each frame
 function draw() {
     background(253, 233, 103);
 
@@ -225,6 +234,7 @@ function draw() {
     radiusSeparationSliderValuePredator = radiusSeparationSliderPredator.value();
     radiusPreySliderValuePredator = radiusPreySliderPredator.value();
 
+    // Checking if the number of preys are changed via slider and then adds or deletes accordingly
     var currentBoids = numberOfPreysSlider.value();
     if(currentBoids != totalBoids) {
         console.log(currentBoids);
@@ -246,6 +256,7 @@ function draw() {
     }
     flock.moveBoids();
 
+    // Checking if the number of predators are changed via slider and then adds or deletes accordingly
     var currentPredators = numberOfPredatorsSlider.value();
     if(currentPredators != totalPredators) {
         if(currentPredators > totalPredators) {

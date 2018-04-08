@@ -1,10 +1,9 @@
 // The flock of boids
 var flock;
 var predatorFlock;
-var rangeSlider;
 var canvas;
-var totalBoids = 100;
-var totalPredators = 0;
+var totalBoids;
+var totalPredators;
 
 var canvasWidth;
 var canvasHeight;
@@ -13,15 +12,6 @@ var totalColors = 2;
 var greenColor;
 var blueColor;
 var colorsArray;
-
-// GUI Sliders for prey
-var cohesionSliderPrey;
-var alignmentSliderPrey;
-var separationSliderPrey;
-
-var radiusCohesionSliderPrey;
-var radiusAlignmentSliderPrey;
-var radiusSeparationSliderPrey;
 
 // GUI Slider values for prey
 var cohesionSliderValuePrey;
@@ -36,11 +26,6 @@ var radiusSeparationSliderValuePrey;
 var separationSliderPredator;
 var radiusSeparationSliderPredator;
 var radiusPreySliderPredator;
-
-// GUI Slider values for Predator
-var separationSliderValuePredator;
-var radiusSeparationSliderValuePredator;
-var radiusPreySliderValuePredator;
 
 var controllerXPrey;
 var controllerYPrey;
@@ -64,6 +49,8 @@ var numberOfPreysSliderValue;
 // Color Segregation
 var colorSegregationOnOffButton;
 var isColorSegregationOn;
+
+// Most Important function, can be optimized
 function createGUIElements() {
     var epsilon = 25;
     controllerXNumber = epsilon;
@@ -76,13 +63,14 @@ function createGUIElements() {
     // controllerXPredator = windowWidth - canvasWidth + 125;
     controllerXPredator = (2 * (windowWidth / 3.0)) + epsilon;
     controllerYPredator = 5;
+
     // Prey
-    cohesionSliderPrey = createSlider(0, 2, 1, 0.05);
+    cohesionSliderPrey = createSlider(0, 2, 0.8, 0.05);
     separationSliderPrey = createSlider(0, 2, 1, 0.05);
     alignmentSliderPrey = createSlider(0, 2, 1, 0.05);
 
-    radiusCohesionSliderPrey = createSlider(0,60,45,0.01);
-    radiusAlignmentSliderPrey = createSlider(0,60,25,0.01);
+    radiusCohesionSliderPrey = createSlider(0,60,25,0.01);
+    radiusAlignmentSliderPrey = createSlider(0,60,45,0.01);
     radiusSeparationSliderPrey = createSlider(0,60,12,0.01);
 
     preyLabel = createDiv('Prey');
@@ -219,6 +207,7 @@ function turnOnOffSegregation() {
     console.log("After pressing " + isColorSegregationOn);
 }
 
+// Can be optimized using functions but too lazy :\ and works :p
 function draw() {
     background(253, 233, 103);
 

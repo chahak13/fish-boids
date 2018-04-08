@@ -8,25 +8,25 @@ function Predator(x, y){
   this.maxForce = 0.05;
 }
 
-Predator.prototype.velocitySeparation = function (boid) {
+Predator.prototype.velocitySeparation = function () {
   var limitingDistance = radiusSeparationSliderValuePredator * this.r;
   var limitingPosition = createVector(0,0);
-  var nearbyBoids = 0;
-  for (b of flock.boids) {
-    var distance = boid.position.dist(b.position);
+  var nearbyPredators = 0;
+  for (b of predatorFlock.boids) {
+    var distance = this.position.dist(b.position);
     if (distance != 0 && distance < limitingDistance ){
-        var diff = p5.Vector.sub(boid.position,b.position);
+        var diff = p5.Vector.sub(this.position,b.position);
         limitingPosition.add(diff.normalize().div(distance));
-        nearbyBoids++;
+        nearbyPredators++;
       }
     }
 
-  if(nearbyBoids){
-    limitingPosition.div(nearbyBoids);
+  if(nearbyPredators){
+    limitingPosition.div(nearbyPredators);
   }
 
   if(limitingPosition.mag()){
-    limitingPosition.normalize().mult(boid.maxSpeed).sub(boid.velocity).limit(boid.maxForce);
+    limitingPosition.normalize().mult(this.maxSpeed).sub(this.velocity).limit(this.maxForce);
   }
   return limitingPosition
 }
@@ -34,9 +34,12 @@ Predator.prototype.velocitySeparation = function (boid) {
 Predator.prototype.update = function () {
 
   var lockingVelocity = this.lockPredator();
+  var separationVelocity = this.velocitySeparation();
 
-  // Coefficient to scale the separation velocity 
+  // Coefficient to scale the separation velocity
   var separationCoefficient = separationSliderValuePredator;
+
+  this.velocity.add(separationVelocity.mult(separationCoefficient));
   this.velocity.add(lockingVelocity).limit(this.maxSpeed);
   this.position = this.position.add(this.velocity);
 };

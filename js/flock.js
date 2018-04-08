@@ -17,4 +17,20 @@ Flock.prototype.moveBoids = function(){
       this.boids[i].render();
     }
   }
+
+  // If prey then render ellipses
+  Flock.prototype.renderEllipses = function() {
+      if(this.boids.length == 0)
+        return;
+      stroke("#FF0000");
+      noFill();
+      ellipse(this.boids[0].position.x, this.boids[0].position.y, 2 * radiusCohesionSliderValuePrey, 2 * radiusCohesionSliderValuePrey);
+      stroke("#00FF00");
+      noFill();
+      ellipse(this.boids[0].position.x, this.boids[0].position.y, 2 * radiusAlignmentSliderValuePrey, 2 * radiusAlignmentSliderValuePrey);
+      stroke("#0000FF");
+      noFill();
+      ellipse(this.boids[0].position.x, this.boids[0].position.y, 2 * radiusSeparationSliderValuePrey, 2 * radiusSeparationSliderValuePrey);
+      stroke("#000000");
+  }
 }

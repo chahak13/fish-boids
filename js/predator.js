@@ -8,6 +8,7 @@ function Predator(x, y){
   this.maxForce = 0.05;
 }
 
+// The velocitySeparation function returns the velocity as governed by the Collision Avoidance rule from Craig Reynolds' model
 Predator.prototype.velocitySeparation = function () {
   var limitingDistance = radiusSeparationSliderValuePredator * this.r;
   var limitingPosition = createVector(0,0);
@@ -31,6 +32,7 @@ Predator.prototype.velocitySeparation = function () {
   return limitingPosition
 }
 
+// The update function calculates the new position and velocity of the predator
 Predator.prototype.update = function () {
 
   var lockingVelocity = this.lockPredator();
@@ -44,6 +46,7 @@ Predator.prototype.update = function () {
   this.position = this.position.add(this.velocity);
 };
 
+// lockPredator function locks the predator to the center of the nearest swarm of boids and returns the velocity vector to move the predator in that direction
 Predator.prototype.lockPredator = function () {
 
   var neighbordist = radiusPreySliderValuePredator * this.r;
@@ -66,34 +69,15 @@ Predator.prototype.lockPredator = function () {
   return createVector(0,0);
 }
 
-Predator.prototype.repelForce = function(predatorLocation) {
-  var safeDistance = 50;
-  var futurePosition = p5.Vector.add(this.position, this.velocity);
-  var distance = p5.Vector.dist(predatorLocation, futurePosition);
-
-  if (distance <= safeDistance) {
-    repelVector = p5.Vector.sub(this.position, predatorLocation);
-    repelVector.normalize();
-    if (distance != 0) {
-      repelVector.mult(this.maxForce*5);
-      if (repelVector.mag()<0) {
-        repelVector.y = 0;
-      }
-    }
-    return repelVector;
-  }
-
-  return createVector(0,0);
-}
-
+// This function wraps the boid around the canvas if the boid reaches the border of the canvas
 Predator.prototype.borders = function() {
-  // console.log('It does Wraparound')
   if (this.position.x < -this.r)  this.position.x = width +this.r;
   if (this.position.y < -this.r)  this.position.y = height+this.r;
   if (this.position.x > width +this.r) this.position.x = -this.r;
   if (this.position.y > height+this.r) this.position.y = -this.r;
 }
 
+// This function draws shapes of the predators on the canvas
 Predator.prototype.render = function() {
   // Draw a triangle rotated in the direction of velocity
   var theta = this.velocity.heading() + radians(90);

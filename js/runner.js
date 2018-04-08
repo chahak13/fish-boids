@@ -4,7 +4,7 @@ var predatorFlock;
 var rangeSlider;
 var canvas;
 var totalBoids = 100;
-var totalPredators = 5;
+var totalPredators = 0;
 
 var canvasWidth;
 var canvasHeight;
@@ -50,6 +50,13 @@ var labelOffset;
 var controllerXPredator;
 var controllerYPredator;
 
+// Number of predators slider
+var numberOfPredatorsSlider;
+var numberOfPredatorsSliderValue;
+
+// Color Segregation
+var colorSegregationOnOffButton;
+var isColorSegregationOn;
 function createGUIElements() {
     controllerXPrey = 125;
     controllerYPrey = 5;
@@ -103,17 +110,21 @@ function createGUIElements() {
     radiusAlignmentPreyLabel.position(radiusAlignmentSliderPrey.x + radiusAlignmentSliderPrey.width
         + labelOffset, radiusAlignmentSliderPrey.y);
 
+    colorSegregationOnOffButton = createCheckbox('Color Segregation', false);
+    // colorSegregationOnOffButtonLabel = createDiv('Color Segregation');
+    colorSegregationOnOffButton.position(controllerXPrey, controllerYPrey
+        + 9 * controllerOffset);
     // Predator
     separationSliderPredator = createSlider(0, 2, 1, 0.05);
     radiusSeparationSliderPredator = createSlider(0, 60, 12, 0.01);
     radiusPreySliderPredator = createSlider(0, 60, 50, 0.01);
 
     separationSliderPredator.position(controllerXPredator, controllerYPredator
-        + 2 * controllerOffset);
-    radiusSeparationSliderPredator.position(controllerXPredator, controllerYPredator
         + 3 * controllerOffset);
-    radiusPreySliderPredator.position(controllerXPredator, controllerYPredator
+    radiusSeparationSliderPredator.position(controllerXPredator, controllerYPredator
         + 4 * controllerOffset);
+    radiusPreySliderPredator.position(controllerXPredator, controllerYPredator
+        + 5 * controllerOffset);
 
     separationPredatorLabel = createDiv('Separation Coefficient');
     separationPredatorLabel.position(separationSliderPredator.x + separationSliderPredator.width
@@ -124,6 +135,14 @@ function createGUIElements() {
     radiusPreyPredatorLabel = createDiv('Radius of Vision');
     radiusPreyPredatorLabel.position(radiusPreySliderPredator.x +
         radiusPreySliderPredator.width + labelOffset, radiusPreySliderPredator.y);
+
+    numberOfPredatorsSlider = createSlider(0, 5, 0, 1);
+    numberOfPredatorsSlider.position(controllerXPredator,
+        controllerYPredator + 2 * controllerOffset);
+    numberOfPredatorsLabel = createDiv('Number of predators');
+    numberOfPredatorsLabel.position(numberOfPredatorsSlider.x
+        + numberOfPredatorsSlider.width + labelOffset,
+        numberOfPredatorsSlider.y);
 }
 function centerCanvas() {
     var x = (windowWidth - canvasWidth) / 2;
@@ -151,6 +170,7 @@ function setup() {
         var boid = new Boid(canvasWidth / 2 - xOffSet, canvasHeight / 2 - yOffSet);
         flock.addBoid(boid);
     }
+    totalPredators = numberOfPredatorsSlider.value();
     for (var i = 0; i < totalPredators; i++) {
         xOffSet = random(canvasWidth / 2);
         yOffSet = random(canvasHeight / 2);
@@ -162,9 +182,17 @@ function setup() {
     blueColor = color(0, 0, 255);
     colorsArray = [greenColor, blueColor];
 
+    colorSegregationOnOffButton.changed(turnOnOffSegregation);
+}
 
-
-
+function turnOnOffSegregation() {
+    if (isColorSegregationOn) {
+        isColorSegregationOn = false;
+    }
+    else {
+        isColorSegregationOn = true;
+    }
+    console.log("After pressing " + isColorSegregationOn);
 }
 
 function draw() {
@@ -186,5 +214,17 @@ function draw() {
     radiusPreySliderValuePredator = radiusPreySliderPredator.value();
 
     flock.moveBoids();
+    var currentPredators = numberOfPredatorsSlider.value();
+    if(currentPredators != totalPredators) {
+        predatorFlock.boids = [];
+        totalPredators = currentPredators;
+        for(var i = 0; i < totalPredators; i++) {
+            xOffSet = random(canvasWidth / 2);
+            yOffSet = random(canvasHeight / 2);
+            var boid = new Predator(canvasWidth / 2 - xOffSet, canvasHeight / 2 - yOffSet);
+            predatorFlock.addBoid(boid);
+        }
+    }
     predatorFlock.moveBoids();
+
 }

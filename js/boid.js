@@ -18,7 +18,7 @@ Boid.prototype.velocityCohesion = function (boid) {
   for (b of flock.boids) {
     var distance = boid.position.dist(b.position)
     if (distance != 0 && distance < neighbordist ) {
-      if(this.color == b.color) {
+      if(this.color == b.color && isColorSegregationOn) {
         perceivedCenterOfMass.add(b.position);
         nearbyBoids++;
       }
